@@ -31,6 +31,10 @@ View product description, specs, rating, price and quantity available
 ![Product Page](https://i.imgur.com/NjpF1UE.png "Product Page")  
   <br><br>
 
+##### Product rating:
+The rating will show the average rating and the total amount of people that have reviewed a particular product. Each user will be able to rate a product only once, but they can change their rating simply by clicking on the stars (If a user is not registered or doesn't have a current order the review will be noted and displayed once they purchase the item, In order to prevent bots from rating products)
+![Product rating](https://i.imgur.com/r0jF57U.png "Product rating")  
+
 #### Shopping Cart:
 When a customer first add an Item to the cart an order will be created for that customer and it will be marked as not complete.  
 If the visitor is not logged in, the order will be assigned to his device [Token](./README.md#Tokens) .  
