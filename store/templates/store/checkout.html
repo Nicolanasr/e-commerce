@@ -1,0 +1,179 @@
+{% extends "index/base.html" %}
+{% block title %}checkout{% endblock %}
+{% load static %}
+{% block content %}
+
+
+
+<div class="container mt-4 ">
+  <div class="row">
+    <div class="col mt-4 ">
+    <div class="shadow-lg p-4">
+      <div class="container">
+        {{errors}}
+        <form method="POST" action="" class="row g-3" id="shipping-form">
+          {% csrf_token %}
+          {% if not request.user.is_authenticated %}
+            <div class="col-md-6">
+              <label for="inputEmail4" class="form-label">Name</label>
+              <input name="name" type="name" class="form-control" id="inputEmail4" required>
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">E-mail</label>
+              <input name=email type="email" class="form-control" id="email" required>
+            </div>
+          {% endif %}
+          <div class="col-12">
+            <label for="inputAddress" class="form-label">Address</label>
+            <!-- <input type="text" name="address" class="form-control" id="inputAddress" placeholder="1234 Main St" required> -->
+            {{form.address}}
+          </div>
+          <div class="col-12">
+            <label for="inputAddress2" class="form-label">Address 2</label>
+            <!-- <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor"> -->
+            {{form.address2}}
+          </div>
+          <div class="col-md-6">
+            <label for="inputCity" class="form-label">City</label>
+            <!-- <input type="text" class="form-control" id="inputCity" required> -->
+            {{form.city}}
+          </div>
+          <div class="col-md-4">
+            <label for="inputState" class="form-label">State</label>
+            {{form.state}}
+            <!-- <select id="inputState" class="form-select">
+              <option selected>Choose...</option>
+              <option>...</option>
+            </select> -->
+          </div>
+          <!-- <div class="col-md-2">
+            <label for="inputZip" class="form-label">Zip</label>
+            <input type="text" class="form-control" id="inputZip" required>
+          </div> -->
+          
+          <div class="col-12">
+            payment
+        <button class="btn btn-primary">make payment</button>
+          </div>
+        </form>
+
+        
+      </div>
+      </div>
+    </div>
+    
+    <div class="col">
+      <div class="row">
+        <div class="col-lg-12 p-5 pt-2 bg-white rounded shadow-lg mt-4">
+          <a href={% url 'store:cart' %} class="btn btn-outline-secondary mb-5">&#8592; Back to cart</a>
+
+          <!-- Shopping cart table -->
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="p-2 px-3 text-uppercase">Product</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Price</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Quantity</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orderItems %}
+                <tr>
+                  <th scope="row" class="border-0">
+                    <div class="p-2">
+                      <img src="{% static order.product.image %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                      <div class="ml-3 d-inline-block align-middle">
+                        <h5 class="mb-0"> <a href="#"
+                            class="text-dark d-inline-block align-middle">{{order.product}}</a></h5><span
+                          class="text-muted font-weight-normal font-italic d-block">Category:
+                          {{order.product.category}}</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td class="border-0 align-middle">${{order.getTotal|floatformat:2}}</td>
+                  <td class="border-0 align-middle"><strong>{{order.quantity}}</strong></td>
+                </tr>
+                {% endfor %}
+
+                
+
+              </tbody>
+            </table>
+            {% for message in messages %}
+              <p{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+            <form action={% url 'store:apply_coupon' %} method='POST' class="input-group mb-4 border rounded-pill p-2">
+              {% csrf_token %}
+                <input type="text" placeholder="Apply coupon" name="coupon" aria-describedby="button-addon3" class="form-control border-0">
+                <div class="input-group-append border-0">
+                  <button id="button-addon3" type="submit" class="btn btn-dark px-4 rounded-pill"><i class="fa fa-gift mr-2"></i>Apply coupon</button>
+                </div>
+              </form>
+              {% if coupon %}
+            <form action={% url 'store:remove_coupon' %} method='POST' class="input-group mb-4 border rounded-pill p-2">
+              {% csrf_token %}
+                  <strong>coupon applied:</strong> {{ coupon }}, ${{coupon.value}}
+                  <button id="button-addon3" name='remove' type="submit" value='delete_coupon' class="btn btn-dark px-4 rounded-pill ml-5"><i class="fa fa-trash mr-2"></i>Remove coupon</button>
+              </form>
+              
+                
+              {% endif %}
+            <li class="d-flex justify-content-between py-3 border-bottom"><strong class="text-muted">Total</strong>
+              {% if coupon %}
+                <h5 class="font-weight-bold" style="text-decoration-line: line-through;">${{order.total|floatformat:2}}</h5>
+                <h5 class="font-weight-bold">${{order.totalAfterCoupon|floatformat:2}}</h5
+              {% else %}
+                <h5 class="font-weight-bold">${{tot|floatformat:2}}</h5>
+              {% endif %}
+            </li>
+          </div>
+          <!-- End -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var form_fields = document.getElementsByTagName("input");
+  var texta = document.getElementsByName("address2");
+  // form_fields[1].placeholder = "ex address1";
+  // form_fields[2].placeholder = "ex city";
+  // form_fields[3].placeholder = "ex state";
+
+  form_fields[1].className = "form-control"
+  form_fields[2].className = "form-control"
+  form_fields[3].className = "form-control"
+  texta[0].className= "form-control"
+  form_fields[4].className = "form-control"
+  form_fields[5].className = "form-control"
+  form_fields[6].className = "form-control"
+  form_fields[7].className = "form-control"
+
+
+  // for (var field in form_fields) {
+  //   form_fields[field].className = " form-control";
+  // }
+  // const cont = document.getElementById("continue")
+  // const payment = document.getElementById("payment")
+  // const form = document.getElementById("shipping-form")
+  
+  // form.addEventListener('submit', f=>{
+  //   f.preventDefault();
+  // })
+
+  // cont.addEventListener('click', fun=>{
+  //     payment.hidden = false
+  //   })
+    
+
+</script>
+
+{% endblock %}

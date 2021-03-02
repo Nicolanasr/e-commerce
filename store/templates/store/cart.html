@@ -1,0 +1,322 @@
+{% extends "index/base.html" %}
+{% block title %}cart{% endblock %} 
+{% load mathfilters %}
+{% load static %}
+
+{% block content %}
+<div class="px-4 px-lg-0">
+    <!-- https://bootstrapious.com/p/bootstrap-shopping-cart -->
+  <!-- For demo purpose -->
+  <!-- <div class="container text-white py-5 text-center">
+    <h1 class="display-4">Bootstrap 4 shopping cart</h1>
+    <p class="lead mb-0">Build a fully structred shopping cart page using Bootstrap 4. </p>
+    <p class="lead">Snippet by <a href="https://bootstrapious.com/snippets" class="text-white font-italic">
+            <u>Bootstrapious</u></a>
+    </p>
+  </div> -->
+  <!-- End -->
+
+
+  <div class="pb-5 mt-4">
+    <div class="container">
+      {% for message in messages %}
+        <div {% if message.tags != 'error'%} class="mt-4 alert alert-{{ message.tags }} 
+      {% elif message.tags == 'error' %}
+        class=" mt-4 alert alert-danger {% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      <div class="row">
+        <div class="col-lg-12 p-md-5 pb-0 bg-white rounded shadow-sm mb-5 p-sm-1 pt-sm-5">
+
+          <!-- Shopping cart table -->
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="p-2 px-3 text-uppercase">Product</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Price</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Quantity</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Total</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for order in orderItems %}
+                  <tr>
+                    <th scope="row" class="border-0 col-8">
+                      <div class="p-2 ">
+                        <img src="{% static order.product.image %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                        <div class="ml-3 d-inline-block align-middle w-75">
+                          <h5 class="mb-0 w-75"> <a href="#" class="text-dark d-inline-block align-middle">{{order.product}}</a></h5><span class="text-muted font-weight-normal font-italic d-block">Category: {{order.product.category}}</span>
+                        </div>
+                      </div>
+                    </th>
+                    <div class="col">
+                      <td class="border-0 align-middle"><strong>$ <span class="ppp">{{order.product.price|floatformat:2}}</span></strong></td>
+                    <td class="border-0 align-middle">
+                      <div >
+                      <form action="" method='POST' class="qty">
+                        {% csrf_token %}
+                        <input type="text" name='order' value={{ order.id }} hidden>
+                        <button type='submit' class='btn' name='add' value=-1><i class="fas fa-sort-down"></i></button>
+                        <span class='qtyrel'>{{order.quantity}}</span> /<strong class="maxqty">{{ order.product.qty }}</strong>
+                        <!-- <input type="number" min=0 value="{{order.quantity}}" disabled> -->
+                        <button type='submit' class='btn' name='add' value=+1><i class="fas fa-sort-up"></i></button>
+                      </form>
+                    </td>
+                    <td class="border-0 align-middle">$ <span class="total-o">{{order.getTotal|floatformat:2}}</span></td>
+                    </div>
+                   
+                    </div>
+                  </tr>
+              {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+          
+          <a href={% url 'store:index' %} class="btn btn-outline-secondary my-5">Continue shopping &#8594;</a>
+
+          <!-- End -->
+        </div>
+      </div>
+
+      <div class="row py-5 p-4 bg-white rounded shadow-sm">
+        <div class="col-lg-6">
+          
+          <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Instructions for seller</div>
+          <div class="p-4">
+            <p class="font-italic mb-4">If you have some information for the seller you can leave them in the box below</p>
+            <textarea name="" cols="30" rows="2" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Order summary </div>
+          <div class="p-4">
+            <p class="font-italic mb-4">Shipping and additional costs are calculated based on values you have entered.</p>
+            <p class="text-black-50">(Make sure to refresh the page for the total to be calculated)</p>
+            <ul class="list-unstyled mb-4">
+              <li class="d-flex justify-content-between py-3 border-bottom"><strong class="text-muted">Order Subtotal </strong><strong> $<span id="totalt">{{total|floatformat:2}}</span></strong></li>
+              <li class="d-flex justify-content-between py-3 border-bottom"><strong class="text-muted">Shipping and handling</strong><strong>$ <span id="shipment">{% widthratio total 100 10 %}</span> </strong></li>
+              <li class="d-flex justify-content-between py-3 border-bottom"><strong class="text-muted">Tax</strong><strong>$0.00</strong></li>
+              <li class="d-flex justify-content-between py-3 border-bottom"><strong class="text-muted">Total</strong>
+                <h5 class="font-weight-bold">$<span id="total-final">{{tot|floatformat:2}}</span></h5>
+              </li>
+            </ul><a href={% url 'store:checkout' %} class="btn btn-dark rounded-pill py-2 btn-block">Procceed to checkout</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{% if orderComplete %}
+  <div class="container mt-3">
+  <h4>Orders awaiting shipment:</h4>
+  </div>
+    {% for order in orderComplete %}
+      <div class="container mt-3">
+        <h5>Order: {{ forloop.counter }}</h5>
+        <div class="col-lg-12 p-5 py-2 bg-white rounded shadow-sm mb-5">
+        
+        <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="p-2 px-3 text-uppercase">Product</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Price</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Quantity</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Total</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              
+              {% for order in order.orderitem_set.all %}
+                  <tr>
+                    <th scope="row" class="border-0">
+                      <div class="p-2">
+                        <img src="{% static order.product.image %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                        <div class="ml-3 d-inline-block align-middle">
+                          <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.product}}</a></h5><span class="text-muted font-weight-normal font-italic d-block">Category: {{order.product.category}}</span>
+                        </div>
+                      </div>
+                    </th>
+                    <td class="border-0 align-middle"><strong>$ <span class="ppp">{{order.product.price|floatformat:2}}</span></strong></td>
+                    <td class="border-0 align-middle"><strong> <span class="ppp">{{order.quantity}}</span></strong></td>
+                    <td class="border-0 align-middle">$ <span class="total-o">{{order.getTotal|floatformat:2}}</span></td>
+                   
+                    </div>
+                  </tr>
+              {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+          <div class="container my-4">
+            <div class="row">
+              <div class="col-sm">
+                <form action={% url 'store:ordercancel' order.id %} method='POST'>
+                  {% csrf_token %}
+                  <button type='submit' class="btn btn-danger w-50">Cancel order</button>
+                </form>
+              </div>
+              <div class="col-sm d-flex justify-content-center">
+                Transaction id: {{ order.transaction_id }}
+              </div>
+              <div class="col-sm d-flex justify-content-end" >
+                Order Total: ${{ order.totalAfterCoupon|floatformat:2}}
+              </div>
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+
+
+<script>
+  const qty = document.getElementsByClassName('qty')
+  var totalo = document.getElementsByClassName('total-o')
+  var ppp = document.getElementsByClassName('ppp')
+  var totalt = document.getElementById('totalt') 
+  var shipment = document.getElementById('shipment') 
+  var totalFinal = document.getElementById('total-final') 
+
+  //console.log(parseFloat(totalt.textContent), parseInt(shipment.textContent), parseFloat(totalFinal.textContent))
+
+  sh = (parseInt(totalt.textContent)/100*10).toFixed(0)
+  tfinal = (parseFloat(totalt.textContent) + parseInt(sh))
+
+
+  const url = ""
+
+  for(var i = 0; i < qty.length; i++){
+    //console.log(qty[i].children[3].valueAsNumber)
+    let item = qty[i].children[1]
+    let quant = qty[i].children[3]
+    let maxQuant =  qty[i].children[4]
+    let a = qty[i].children[5]
+    let csrf = qty[i].children[0]
+    let f = qty[i];
+
+    f.addEventListener('submit', fun=>{
+      fun.preventDefault();
+    })
+
+    let tot = totalo[i]
+    let price = ppp[i]
+
+    a.addEventListener('click', e=>{
+      if(parseInt(quant.textContent) < parseInt(maxQuant.textContent)) {
+      
+        quant.textContent = parseInt(quant.textContent) + 1
+        tot.textContent = (parseInt(quant.textContent)*parseFloat(price.textContent)).toFixed(2)
+        totalt.textContent = (parseFloat(price.textContent) + parseFloat(totalt.textContent)).toFixed(2)
+        sh = (parseInt(totalt.textContent)/100*10).toFixed(0)
+        shipment.textContent = parseInt(sh)
+        tfinal = (parseFloat(totalt.textContent) + parseInt(sh))
+        totalFinal.textContent = tfinal.toFixed(2)
+
+        const fd = new FormData()
+        fd.append('item', item.value)
+        fd.append('csrfmiddlewaretoken', csrf.value)
+        fd.append('add', a.value)
+        //console.log(item.value, a.value)
+        $.ajax({
+          type: 'POST',
+          url: url,
+          data: fd,
+          cache: false,
+          processData: false,
+          contentType: false,
+          success: function (success){
+              console.log(success)
+          },
+          error: function(error) {
+              console.log(error)
+          }
+          })
+      }else {
+        alert('You have reached The max ammount in stock')
+      }
+     
+    })
+
+    let r = qty[i].children[2]
+    r.addEventListener('click', e=>{
+      quant.textContent = parseInt(quant.textContent) - 1
+      tot.textContent = (parseInt(quant.textContent)*parseFloat(price.textContent)).toFixed(2)
+      totalt.textContent = (parseFloat(totalt.textContent) - parseFloat(price.textContent)).toFixed(2)
+      sh = (parseInt(totalt.textContent)/100*10).toFixed(0)
+      shipment.textContent = parseInt(sh)
+      tfinal = (parseFloat(totalt.textContent) + parseInt(sh))
+      totalFinal.textContent = tfinal.toFixed(2)
+
+      const fd = new FormData()
+      fd.append('item', item.value)
+      fd.append('add', r.value)
+      fd.append('csrfmiddlewaretoken', csrf.value)
+      //console.log(item.value, r.value)
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: fd,
+        cache: false,
+        processData: false,
+        contentType: false,
+        success: function (success){
+            console.log(success,)
+        },
+        error: function(error) {
+            console.log(error)
+        },
+        })
+        if(parseInt(quant.textContent) <= 0) {
+          setTimeout(() => {  location.reload();  }, 100);
+        }
+    })
+  }
+
+  // {% comment %} const items = document.getElementsByName('order')
+  // const add = document.getElementsByName('add')
+  // const csrf = document.getElementsByName('csrfmiddlewaretoken')
+  // const form = document.getElementsByClassName('form')
+  // const url = ""
+
+  // //console.log(form)
+
+  // for(var i=0; i < form.length; i++){
+  //   let f = form[i];
+  //   f.addEventListener('submit', e=>{
+  //     e.preventDefault()
+  //     const fd = new FormData()
+  //     fd.append('csrfmiddlewaretoken', f[0].value)
+  //     fd.append('items', f[1].value)
+  //     fd.append('add', f[2].value)
+  //     console.log(f[2].value, f[3].value)
+
+  //   })
+  // } {% endcomment %}
+</script>
+{% endblock %} 

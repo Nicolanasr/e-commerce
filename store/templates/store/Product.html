@@ -1,0 +1,237 @@
+{% extends "index/base.html" %} {% block title %}Add a new product{% endblock %}
+{% load static %} {% block content %}
+
+
+
+
+<div class="container-fluid">
+	<div class="content-wrapper2">
+		<div class="item-container2">
+			<div class="container2">
+				<div class="col-md-12">
+					<div class="">
+
+						<center>
+							<img src="{% static product.image %}" style="height: 100%; max-height: 255px;">
+						</center>
+					</div>
+
+					<!-- <div class="container2 service1-items col-sm-2 col-md-2 pull-left">
+						<center>
+							<a id="item-1" class="service1-item">
+								<img src="http://www.corsair.com/Media/catalog/product/g/s/gs600_psu_sideview_blue_2.png" alt=""></img>
+							</a>
+							<a id="item-2" class="service1-item">
+								<img src="http://www.corsair.com/Media/catalog/product/g/s/gs600_psu_sideview_blue_2.png" alt=""></img>
+							</a>
+							<a id="item-3" class="service1-item">
+								<img src="http://www.corsair.com/Media/catalog/product/g/s/gs600_psu_sideview_blue_2.png" alt=""></img>
+							</a>
+						</center>
+					</div> -->
+				</div>
+
+				<div class="col">
+
+					<div class="product-title">{{product.title}}</div>
+					<hr>
+					<ul>
+						{% for product_info in product_info %}
+						<li>{{product_info}}</li>
+						{% endfor %}
+					</ul>
+					<!-- <div class="product-info">{{product_info}}</div> -->
+
+					<!-- {% for i in rating_max %}
+						{{i}}
+					{% endfor %} -->
+					<div class="d-flex align-items-end">
+						<div class="d-flex flex-column">
+							<div>Average rating: {{ product.avg_ratings|floatformat:1 }}</div>
+							<div class="text-muted" style="font-size: 12px;">Total Reviews: {{ total_rating_num }}</div>
+						</div>
+						<form action="" method="POST" class="rate-form" id="{{product.id}}">
+							{% csrf_token %}
+							<button type="submit"
+								class="fa fa-star my-btn {% if product.avg_ratings >= 1 %}checked{% endif %}"
+								id="first"></button>
+							<button type="submit"
+								class="fa fa-star my-btn {% if product.avg_ratings >= 2 %}checked{% endif %}"
+								id="second"></button>
+							<button type="submit"
+								class="fa fa-star my-btn {% if product.avg_ratings >= 3 %}checked{% endif %}"
+								id="third"></button>
+							<button type="submit"
+								class="fa fa-star my-btn {% if product.avg_ratings >= 4 %}checked{% endif %}"
+								id="fourth"></button>
+							<button type="submit"
+								class="fa fa-star my-btn {% if product.avg_ratings >= 5 %}checked{% endif %}"
+								id="fifth"></button>
+						</form>
+					</div>
+					<!-- <div class="product-rating"><i class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i class="fa fa-star gold"></i> <i class="fa fa-star-o"></i> </div> -->
+					<hr>
+					<div class="product-price">$ {{product.price}}</div>
+					{% if product.in_stock %}
+					<div class="product-stock">In Stock</div>
+					<div class="text-muted">Quantity availble: {{ product.qty }}</div>
+					<hr>
+					<div class="btn-group cart">
+						<a href={% url 'store:addtocart' product.title %} type="button"
+							class="btn btn-success text-white">
+							Add to cart
+						</a>
+					</div>
+					{% else %}
+					<div class="text-danger">Out of Stock</div>
+					{% endif %}
+					<!-- <div class="btn-group wishlist">
+						<button type="button" class="btn btn-danger">
+							Add to wishlist 
+						</button>
+					</div> -->
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid2">
+			<div class="col-md-12 product-info">
+				<div id="myTabContent" class="tab-content">
+					<section class="container2 product-info">
+						<h4>Description</h4>
+						{{ desc|safe }}
+					</section>
+					<div class="tab-pane fade" id="service-two">
+
+						<section class="container2">
+
+						</section>
+
+					</div>
+					<div class="tab-pane fade" id="service-three">
+
+					</div>
+				</div>
+				<hr>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	const first = document.getElementById('first')
+	const second = document.getElementById('second')
+	const third = document.getElementById('third')
+	const fourth = document.getElementById('fourth')
+	const fifth = document.getElementById('fifth')
+
+	const form = document.querySelector('.rate-form')
+	// const confirmBox = document.getElementById('fifth')
+	const csrf = document.getElementsByName('csrfmiddlewaretoken')
+
+
+	const handleSelect = (selection) => {
+		switch (selection) {
+			case 'first': {
+				first.classList.add('checked')
+				second.classList.remove('checked')
+				third.classList.remove('checked')
+				fourth.classList.remove('checked')
+				fifth.classList.remove('checked')
+				return
+			}
+			case 'second': {
+				first.classList.add('checked')
+				second.classList.add('checked')
+				third.classList.remove('checked')
+				fourth.classList.remove('checked')
+				fifth.classList.remove('checked')
+				return
+			}
+			case 'third': {
+				first.classList.add('checked')
+				second.classList.add('checked')
+				third.classList.add('checked')
+				fourth.classList.remove('checked')
+				fifth.classList.remove('checked')
+				return
+			}
+			case 'fourth': {
+				first.classList.add('checked')
+				second.classList.add('checked')
+				third.classList.add('checked')
+				fourth.classList.add('checked')
+				fifth.classList.remove('checked')
+				return
+			}
+			case 'fifth': {
+				first.classList.add('checked')
+				second.classList.add('checked')
+				third.classList.add('checked')
+				fourth.classList.add('checked')
+				fifth.classList.add('checked')
+				return
+			}
+		}
+	}
+
+	const getNumericValue = (stringValue) => {
+		let numericValue;
+		if (stringValue == 'first') {
+			numericValue = 1
+		} else if (stringValue == 'second') {
+			numericValue = 2
+		} else if (stringValue == 'third') {
+			numericValue = 3
+		} else if (stringValue == 'fourth') {
+			numericValue = 4
+		} else if (stringValue == 'fifth') {
+			numericValue = 5
+		} else {
+			numericValue = 0
+		}
+		return numericValue
+	}
+
+	const arr = [first,
+		second,
+		third,
+		fourth,
+		fifth
+	]
+
+	arr.forEach(item => item.addEventListener('mouseover', (event) => {
+		handleSelect(event.target.id)
+	}))
+
+
+	arr.forEach(item => item.addEventListener('click', (event) => {
+		const val = event.target.id
+		// form.addEventListener('submit', e=>{
+		event.preventDefault()
+		const id = "{{ product.id }}"
+		const val_num = getNumericValue(val)
+		const fd = new FormData()
+		fd.append('el_id', id)
+		fd.append('csrfmiddlewaretoken', csrf[0].value)
+		fd.append('val', val_num)
+
+		$.ajax({
+			type: 'POST',
+			url: '/store/rate_product/',
+			data: fd,
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+				console.log(response)
+			},
+			error: function (error) {
+				console.log(error)
+			},
+		})
+		// })
+	}))
+</script>
+
+
+{% endblock %}

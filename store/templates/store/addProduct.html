@@ -1,0 +1,43 @@
+{% extends "index/base.html" %} {% block title %}Add a new product{% endblock %}
+{% load static %} {% block content %}
+
+
+
+<div class="shadow-lg p-4">
+    <div class="container">
+        {% for message in messages %}
+        <div {% if message.tags != 'error'%} class="mt-4 alert alert-{{ message.tags }} 
+            {% elif message.tags == 'error' %}
+            class=" mt-4 alert alert-danger {% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        <form enctype='multipart/form-data' method="POST" action="" class="row g-3" id="shipping-form" e>
+            {% csrf_token %}
+            {{form.as_p}}
+            <div class="col-12">
+                <button class="btn btn-primary" type=submit>Submit</button>
+            </div>
+        </form>
+
+
+    </div>
+</div>
+</div>
+<script>
+    var form_fields = document.getElementsByTagName("input");
+    var texta = document.getElementsByTagName("textarea");
+    var texts = document.getElementsByTagName("select");
+
+
+    texts[0].className = "form-select"
+
+    form_fields[1].className = "form-control"
+   
+    texta[0].className = "form-control"
+    texta[1].className = "form-control"
+    texta[1].placeholder  = "This will appear as a bulleted list (specs)"
+    form_fields[4].className = "form-control"
+</script>
+{% endblock %}

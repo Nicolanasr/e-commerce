@@ -1,0 +1,86 @@
+{% extends "index/base.html" %}
+{% block title %}{{order}}{% endblock %}
+{% load static %}
+{% block content %}
+
+  <div class="container mt-3">
+  <h4>Info about order: {{ order.transaction_id }}</h4>
+  </div>
+      <div class="container mt-3">
+        <div class="col-lg-12 p-5 py-2 bg-white rounded shadow-sm mb-5">
+        
+        <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="p-2 px-3 text-uppercase">Product</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Price</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Quantity</div>
+                  </th>
+                  <th scope="col" class="border-0 bg-light">
+                    <div class="py-2 text-uppercase">Total</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              
+              {% for order in order.orderitem_set.all %}
+                  <tr>
+                    <th scope="row" class="border-0 w-75">
+                      <div class="p-2 col-8">
+                        <img src="{% static order.product.image %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                        <div class="ml-3 d-inline-block align-middle">
+                          <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.product}}</a></h5><span class="text-muted font-weight-normal font-italic d-block">Category: {{order.product.category}}</span>
+                        </div>
+                      </div>
+                    </th>
+                    <div class='col'>
+                      <td class="border-0 align-middle"><strong>$ <span class="ppp">{{order.product.price|floatformat:2}}</span></strong></td>
+                      <td class="border-0 align-middle"><strong> <span class="ppp">{{order.quantity}}</span></strong></td>
+                      <td class="border-0 align-middle">$ <span class="total-o">{{order.getTotal|floatformat:2}}</span></td>
+                      
+                    </div>
+                   
+                    </div>
+                  </tr>
+              {% endfor %}
+                
+              </tbody>
+            </table>
+          </div>
+          <div class="container my-4 ">
+            <div class="row align-items-center">
+              <div class="col-sm align-self-end">
+                {% if order.shipped %}
+                <p class="bg-success rounded p-2 text-white text-center m-0">Delivery complete</p>
+                {% else %}
+                <p class="bg-info rounded p-2 text-white text-center m-0">It will need some time</p>
+                {% endif %}
+              </div>
+              <div class="col-sm d-flex justify-content-center">
+                Estimated delivery date: {{ order.deliveryDate }}
+              </div>
+              <div class="col-sm d-flex justify-content-center">
+                Transaction id: {{ order.transaction_id }}
+              </div>
+              <div class="col-sm d-flex justify-content-end">
+                Order Total: ${{ order.totalAfterCoupon|floatformat:2}}
+              </div>
+              <form class='col d-flex justify-content-end' action={% url 'store:ordercancel' order.id %} method='POST'>
+                {% csrf_token %}
+                <button type='submit' class="btn btn-danger w-50">Cancel order</button>
+              </form>
+            </div>
+          </div>
+        
+        </div>
+      </div>
+  
+
+
+{% endblock %}

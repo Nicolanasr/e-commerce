@@ -1,0 +1,27 @@
+{% extends "index/base.html" %}
+{% block title %}Track Your order{% endblock %} 
+{% load mathfilters %}
+
+{% block content %}
+
+
+<div class="container">
+{% for message in messages %}
+  <p{% if message.tags != 'error'%} class="mt-4 alert alert-{{ message.tags }}"
+  {% elif message.tags == 'error' %}
+   class="mt-4 alert alert-danger"
+  {% endif %}>{{ message }}</p>
+{% endfor %}
+</div>
+<form class="d-flex container mt-5 tex-center" method='POST' action={% url 'store:trackorderred' %}>
+{% csrf_token %}
+<div class="input-group mb-3">
+  <span class="input-group-text bg-info" id="basic-addon2" >Track your order:</span>
+  <input type="text" class="form-control" placeholder="Your transaction id" id="basic-url" aria-describedby="basic-addon3" name='order_track'>
+  <button class="btn btn-outline-success" type="submit">Search</button>
+</div>
+</form>
+
+
+
+{% endblock %} 

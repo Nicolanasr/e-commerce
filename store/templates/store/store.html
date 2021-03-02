@@ -1,0 +1,192 @@
+{% extends "index/base.html" %}
+{% block title %}Store{% endblock %}
+{%load static%}
+{% block content %}
+
+
+
+<div class='container d-flex p-0'>
+  <form class="container mt-2" method='GET'>
+    <ul class="nav justify-content-between align-items-center">
+      <li class="nav-item">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+
+            <select name="cat" class="custom-select" id="inputGroupSelect01">
+              <option value='all'>Choose...</option>
+              {% for category in categories %}
+              {{category.id}}
+              {% if category.id|slugify == cat|slugify %}
+              <option name="cat" value={{category.id}} selected>{{category}}</option>
+              {% else %}
+              <option name="cat" value={{category.id}}>{{category}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <input type="text" class="form-control" name='product_search' aria-label="Text input with dropdown button">
+          <button class="btn btn-outline-success m-sm-2 my-sm-0" type="submit">Search</button>
+        </div>
+      </li>
+      <li class="nav-item">
+        <div class="input-group mb-3">
+          <select name="price" class="custom-select custom-select-sm" id="inputGroupSelect01"
+            onchange="this.form.submit()">
+            <option value='default'>Sort by:</option>
+            <option value="lowest">Price: Low to high</option>
+            <option value="highest">Price: High to Low</option>
+          </select>
+          <button class="btn btn-link nav-link active pt-0" type='submit' name='clear' href="#">Clear Filters</button>
+        </div>
+      </li>
+    </ul>
+  </form>
+</div>
+
+<div class="container p-md-5 pt-md-1 bg-light shadow-lg">
+  {% for message in messages %}
+  <div {% if message.tags != 'error'%} class="mt-4 alert alert-{{ message.tags }} 
+{% elif message.tags == 'error' %}
+   class=" mt-4 alert alert-danger {% endif %} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  
+  {% if ps != None and products|length != 0%}
+  Showing results for: "{{ps}}"
+  {% endif %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3  g-3 mt-4">
+    {% for product in products %}
+    {% if cat|slugify == 'all' or cat is None %}
+    <div class="col">
+      <div class="card h-100" >
+        <div class="card-img-top" style="height: 255; width: auto; overflow: hidden;">
+          <img src={% static product.image %} style="height: 100%; max-height: 255px;">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{product.title}}</h5>
+          <p class="card-text">{{product.info|truncatewords:25}}</p>
+        </div>
+        <div class="box-element product m-2">
+          <a class="btn btn-outline-success" href={% url 'store:viewProduct' product.id %}>View</a>
+          {% if product.in_stock %}
+            <a href={% url 'store:addtocart' product.title %} class="btn btn-outline-secondary add-btn">Add to Cart</a>
+          {% else %}
+            {% comment %} sd {% endcomment %}
+          {% endif %}
+          
+          <h4 style="display: inline-block; float:right"><strong>{{product.price|floatformat:2}}$</strong></h4>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a href="{% url 'store:index' %}?cat={{ product.category.id }}" style="text-decoration: none;"><small class="text-muted">{{product.category}}</small></a>
+          {% if product.in_stock %}
+            <small class="text-success">In-stock</small>
+          {% else %}
+            <small class="text-danger">Out of stock</small>
+          {% endif %}
+          <em class="text-muted">by: {{ product.seller }}</em>
+        </div>
+      </div>
+    </div>
+    {% elif categor == product.category %}
+    <div class="col">
+      <div class="card h-100">
+         <div class="card-img-top" style="height: 255; width: auto; overflow: hidden;">
+          <img src={% static product.image %} style="height: 100%; max-height: 255px;">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{product.title}}</h5>
+          <p class="card-text">{{product.info|truncatewords:25}}</p>
+        </div>
+        <div class="box-element product m-2">
+          <a class="btn btn-outline-success" href={% url 'store:viewProduct' product.id %}>View</a>
+          {% if product.in_stock %}
+            <a href={% url 'store:addtocart' product.title %} class="btn btn-outline-secondary add-btn">Add to Cart</a>
+          {% else %}
+            {% comment %} sd {% endcomment %}
+          {% endif %}
+          <h4 style="display: inline-block; float: right"><strong>{{product.price|floatformat:2}}$</strong></h4>
+        </div>
+        <div class="card-footer card-footer d-flex justify-content-between">
+          <a href="{% url 'store:index' %}?cat={{ product.category.id }}" style="text-decoration: none;"><small class="text-muted">{{product.category}}</small></a>
+          {% if product.in_stock %}
+            <small class="text-success">In-stock</small>
+          {% else %}
+            <small class="text-danger">Out of stock</small>
+          {% endif %}
+          <em class="text-muted">by: {{ product.seller }}</em>
+        </div>
+      </div>
+    </div>
+    {%endif%}
+    {% endfor %}
+  </div>
+</div>
+</div>
+
+<!-- TODO -->
+<!-- maybe will add later
+   <div class="pagination">
+    <span class="step-links">
+        {% if products.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ products.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ products.number }} of {{ products.paginator.num_pages }}.
+        </span>
+
+        {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}">next</a>
+            <a href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div> -->
+{% comment %} window.location.href = window.location.href; {% endcomment %}
+
+
+
+<!-- 
+<script>
+const search = document.getElementById('search-form')
+const category = search[0]
+const search_word = search[1]
+const clear = search[3]
+
+// console.log(search)
+// console.log(category)
+// console.log(search_word)
+// console.log(clear)
+
+url = ''
+
+search.addEventListener('submit', e=>{
+  e.preventDefault();
+  const fd = new FormData()
+  fd.append('category', category.value)
+  fd.append('search_word', search_word.value)
+  fd.append('clear', clear.value)
+
+
+  $.ajax({
+    type: 'GET',
+    url: url,
+    data: fd,
+    cache: false,
+    processData: false,
+    contentType: false,
+    success: function (success){
+        console.log(success)
+    },
+    error: function(error) {
+        console.log(error)
+    }
+    })
+  
+})
+</script> -->
+
+
+{% endblock %}
