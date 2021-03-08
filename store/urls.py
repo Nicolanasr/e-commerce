@@ -19,4 +19,7 @@ urlpatterns = [
     path('add_product/', views.addProduct, name="addProduct"),
     path('rate_product/', views.rate_product, name="rate_product"),
     path('product/<int:product_id>', views.viewProduct, name="viewProduct"),
+    path('api/products', views.productsApi, name='productApi'), 
+    path('api/', views.api, name='api'), 
+    path('api/products/<str:pk>', views.singleProductApi, name='singleProductApi'), 
 ]

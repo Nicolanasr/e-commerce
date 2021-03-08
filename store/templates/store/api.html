@@ -1,0 +1,54 @@
+<!-- {% extends "index/base.html" %}
+{% block title %}API{% endblock %}
+{% load static %}
+{% block content %} -->
+
+{{token}}
+
+<input id="submitButton" type="button" value='Request api call'/>
+<div id='data'>
+</div>
+<ul id='ul'></ul>
+
+<script>
+    var data = document.getElementById('data')
+    function beautifyJson(json) {
+        var object = JSON.parse(json);
+        return JSON.stringify(object, null, 4); // 4 spaces as indent
+    }
+    $('#submitButton').on('click',function(){
+        $.ajax({
+            url: "http://localhost:8000/store/api/products",
+            type: 'GET',
+            contentType: 'application/json',
+            headers: {
+                        "Authorization": "Token " + '{{token}}'
+                    },
+            async: false,
+            success: function (response) {
+                const array = Object.keys(response).map(i => response[i])
+                var arr = []
+
+                for (i=0; i < array.length; i++) {
+                    // console.log(JSON.stringify(array[i]), null, "\t")
+                    arr.push(JSON.stringify(array[i], null, "\t"))
+                }
+                json = '[' + arr + ']';
+                beautifyJson(json);
+                console.log('{{ request.META }}')
+                data.textContent =  json
+
+                
+                // console.log(Object.values(array[0]))
+                
+                // Object.values()
+			},
+			error: function (error) {
+				console.log(error)
+			},
+        })
+    });
+</script>
+
+<!-- 
+{% endblock %} -->

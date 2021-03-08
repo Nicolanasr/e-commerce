@@ -26,12 +26,12 @@ SECRET_KEY = '1)-vdvncy%!$wxh76ozhs8m%-i-sc#en5v(0+xg2m+@q&=q17('
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-# DEBUG = True
-# ALLOWED_HOSTS = []
+DEBUG = True
+ALLOWED_HOSTS = []
 
 
-DEBUG = False
-ALLOWED_HOSTS = ['nicolas-e-commerce.herokuapp.com']
+# DEBUG = False
+# ALLOWED_HOSTS = ['nicolas-e-commerce.herokuapp.com']
 
 
 
@@ -47,7 +47,15 @@ INSTALLED_APPS = [
     'store',
     'index',
     'mathfilters',
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

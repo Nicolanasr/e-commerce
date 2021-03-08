@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
+from rest_framework import serializers
 from .models import Product, Category, Customer, ShippingAddress, Order, OrderItem, Coupon, User, Rating
 from django.contrib.auth.models import Group
-from django.http import HttpResponse, JsonResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, Http404, HttpResponseRedirect, response
 from django.core.paginator import Paginator
 from django.contrib import messages
 from random import *
@@ -11,6 +12,13 @@ import time, re
 import uuid
 import datetime
 from datetime import timedelta
+from .serializers import ProductSerializer
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 # Create your views here.
 
 #// TODO user generated reviews
@@ -130,7 +138,7 @@ def cart(request):
     # for oi in orderItems:
     #     print(oi.product.qty)
 
-    if request.is_ajax():
+    
         item = request.POST.get('item')
         add = request.POST.get('add')
         data['item'] = item
@@ -523,6 +531,45 @@ def rate_product(request):
         print('rating: ', rating/len(rates))
         return JsonResponse({'success':'true', 'rating':val}, safe=False)
     return JsonResponse({'success':'False'})
+
+
+def api(request):
+    if request.method == 'GET':
+        try:
+            token = Token.objects.get(user=request.user)
+            return render(request, 'store/api.html', {'token': token})
+        except:
+            messages.warning(request, "You don't have permissions to access this webpage")
+            return redirect('store:index')
+    
+    
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])  
+@permission_classes([IsAuthenticated])
+def productsApi(request):
+    # if request.is_ajax():
+    #     return JsonResponse({'success':'true'}, safe=False)
+    
+    if request.method == 'GET':
+        # print(request.headers)
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])  
+@permission_classes([IsAuthenticated])
+def singleProductApi(request, pk):
+    try:
+        products = Product.objects.get(pk=pk)
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ProductSerializer(products)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 def test(request):
