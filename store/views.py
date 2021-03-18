@@ -138,7 +138,7 @@ def cart(request):
     # for oi in orderItems:
     #     print(oi.product.qty)
 
-    
+    if request.is_ajax():
         item = request.POST.get('item')
         add = request.POST.get('add')
         data['item'] = item

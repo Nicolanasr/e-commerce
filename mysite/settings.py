@@ -31,7 +31,7 @@ SECRET_KEY = '1)-vdvncy%!$wxh76ozhs8m%-i-sc#en5v(0+xg2m+@q&=q17('
 
 
 DEBUG = True
-ALLOWED_HOSTS = ['nicolas-e-commerce.herokuapp.com']
+ALLOWED_HOSTS = ['nicolas-e-commerce.herokuapp.com', 'localhost']
 
 
 
